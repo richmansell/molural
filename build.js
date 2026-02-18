@@ -5,6 +5,7 @@ const path = require('path');
 
 const srcDir = path.join(__dirname, 'src');
 const outputFile = path.join(__dirname, 'shape_wall.html');
+const galleryOutputFile = path.join(__dirname, 'gallery.html');
 
 // Read base HTML
 const htmlPath = path.join(srcDir, 'index.html');
@@ -34,6 +35,12 @@ html = html.replace(
     `<script>\n${scripts}\n</script>\n</body>`
 );
 
-// Write output
+// Write shape_wall.html
 fs.writeFileSync(outputFile, html, 'utf8');
 console.log(`✓ Built shape_wall.html successfully`);
+
+// Copy gallery.html (it's already self-contained)
+const galleryHtml = fs.readFileSync(path.join(srcDir, 'gallery.html'), 'utf8');
+fs.writeFileSync(galleryOutputFile, galleryHtml, 'utf8');
+console.log(`✓ Built gallery.html successfully`);
+

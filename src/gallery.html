@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Molural Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: white;
+            padding: 20px;
+        }
+
+        .gallery-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .gallery-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .gallery-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .gallery-header p {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .carousel-wrapper {
+            position: relative;
+            background: #f5f5f5;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .carousel-container {
+            display: flex;
+            gap: 15px;
+            padding: 20px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            min-height: 350px;
+        }
+
+        .carousel-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .carousel-container::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 10px;
+        }
+
+        .carousel-container::-webkit-scrollbar-thumb {
+            background: #FFB3BA;
+            border-radius: 10px;
+        }
+
+        .carousel-image {
+            flex: 0 0 calc(20% - 12px);
+            min-width: 150px;
+            height: auto;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .carousel-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 179, 186, 0.4);
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .carousel-btn:hover {
+            background: #FFB3BA;
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 179, 186, 0.4);
+        }
+
+        .prev {
+            left: 15px;
+        }
+
+        .next {
+            right: 15px;
+        }
+
+        .carousel-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .no-submissions {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+            font-size: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+            font-size: 14px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: #FFB3BA;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .carousel-image {
+                flex: 0 0 calc(33.333% - 10px);
+                min-width: 100px;
+            }
+
+            .carousel-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .prev {
+                left: 10px;
+            }
+
+            .next {
+                right: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .carousel-image {
+                flex: 0 0 calc(50% - 7.5px);
+                min-width: 80px;
+            }
+
+            .carousel-container {
+                padding: 15px;
+            }
+
+            .carousel-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gallery-container">
+        <div class="gallery-header">
+            <h1>🎨 Molural Gallery</h1>
+            <p>Latest artworks created with Molural</p>
+        </div>
+
+        <div class="carousel-wrapper">
+            <button class="carousel-btn prev" id="prevBtn">‹</button>
+            <div class="carousel-container" id="carouselContainer">
+                <div class="loading">Loading gallery...</div>
+            </div>
+            <button class="carousel-btn next" id="nextBtn">›</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="">
+            <button class="modal-close" id="closeModal">×</button>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - update with your Discord webhook URL
+        const DISCORD_WEBHOOK_URL = 'YOUR_DISCORD_WEBHOOK_URL_HERE';
+        const TIMEZONE_OFFSET = new Date().getTimezoneOffset();
+
+        class GalleryCarousel {
+            constructor() {
+                this.container = document.getElementById('carouselContainer');
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.modal = document.getElementById('modal');
+                this.modalImage = document.getElementById('modalImage');
+                this.closeModal = document.getElementById('closeModal');
+                this.images = [];
+                this.currentScroll = 0;
+
+                this.setupEventListeners();
+                this.loadGallery();
+            }
+
+            setupEventListeners() {
+                this.prevBtn.addEventListener('click', () => this.scroll(-300));
+                this.nextBtn.addEventListener('click', () => this.scroll(300));
+                this.closeModal.addEventListener('click', () => this.modal.classList.remove('active'));
+                this.modal.addEventListener('click', (e) => {
+                    if (e.target === this.modal) {
+                        this.modal.classList.remove('active');
+                    }
+                });
+            }
+
+            loadGallery() {
+                // Try to load from Discord first
+                if (DISCORD_WEBHOOK_URL && DISCORD_WEBHOOK_URL !== 'YOUR_DISCORD_WEBHOOK_URL_HERE') {
+                    this.loadFromDiscord();
+                } else {
+                    this.showNoSubmissions();
+                }
+            }
+
+            loadFromDiscord() {
+                // Note: Discord webhooks are outbound only. For inbound, you'd need a backend.
+                // This shows how it would work with a backend API endpoint
+                const backendApiUrl = 'YOUR_BACKEND_API_URL_HERE'; // e.g., https://your-server.com/api/gallery
+
+                fetch(backendApiUrl)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to load gallery');
+                        return response.json();
+                    })
+                    .then(data => {
+                        this.images = data.images || [];
+                        if (this.images.length === 0) {
+                            this.showNoSubmissions();
+                        } else {
+                            this.renderCarousel();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Gallery load error:', error);
+                        this.showNoSubmissions();
+                    });
+            }
+
+            renderCarousel() {
+                this.container.innerHTML = '';
+
+                if (this.images.length === 0) {
+                    this.showNoSubmissions();
+                    return;
+                }
+
+                this.images.forEach((imageData, index) => {
+                    const img = document.createElement('img');
+                    img.src = imageData.url || imageData;
+                    img.alt = `Gallery submission ${index + 1}`;
+                    img.className = 'carousel-image';
+                    img.addEventListener('click', () => this.openModal(imageData.url || imageData));
+                    this.container.appendChild(img);
+                });
+
+                this.updateButtonStates();
+            }
+
+            scroll(direction) {
+                const scrollAmount = direction;
+                this.container.scrollBy({
+                    left: scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
+
+            updateButtonStates() {
+                const { scrollLeft, scrollWidth, clientWidth } = this.container;
+                this.prevBtn.disabled = scrollLeft === 0;
+                this.nextBtn.disabled = scrollLeft + clientWidth >= scrollWidth - 10;
+            }
+
+            openModal(imageSrc) {
+                this.modalImage.src = imageSrc;
+                this.modal.classList.add('active');
+            }
+
+            showNoSubmissions() {
+                this.container.innerHTML = '<div class="no-submissions">No submissions yet. Create your first artwork with <strong>Molural</strong>!</div>';
+                this.prevBtn.disabled = true;
+                this.nextBtn.disabled = true;
+            }
+        }
+
+        // Initialize gallery when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new GalleryCarousel();
+        });
+    </script>
+</body>
+</html>
