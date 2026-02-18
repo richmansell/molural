@@ -14,128 +14,115 @@
         body {
             font-family: 'Arial', sans-serif;
             background: white;
-            padding: 20px;
+            padding: 0;
+            width: 100%;
+            height: 100%;
         }
 
         .gallery-container {
-            max-width: 1000px;
-            margin: 0 auto;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .gallery-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .gallery-header h1 {
-            color: #333;
-            font-size: 28px;
-            margin-bottom: 5px;
-        }
-
-        .gallery-header p {
-            color: #999;
-            font-size: 14px;
+            display: none;
         }
 
         .carousel-wrapper {
             position: relative;
-            background: #f5f5f5;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            height: 100%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .carousel-container {
             display: flex;
-            gap: 15px;
-            padding: 20px;
-            overflow-x: auto;
+            gap: 5px;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
             scroll-behavior: smooth;
-            min-height: 350px;
+            align-items: center;
+            justify-content: center;
         }
 
         .carousel-container::-webkit-scrollbar {
-            height: 8px;
-        }
-
-        .carousel-container::-webkit-scrollbar-track {
-            background: #e0e0e0;
-            border-radius: 10px;
-        }
-
-        .carousel-container::-webkit-scrollbar-thumb {
-            background: #FFB3BA;
-            border-radius: 10px;
+            display: none;
         }
 
         .carousel-image {
-            flex: 0 0 calc(20% - 12px);
-            min-width: 150px;
-            height: auto;
+            flex: 0 0 calc(20% - 1px);
+            width: auto;
+            height: 100%;
             aspect-ratio: 1;
-            border-radius: 8px;
+            border-radius: 2px;
             object-fit: cover;
             cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
         }
 
         .carousel-image:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(255, 179, 186, 0.4);
+            transform: scaleY(1.02);
         }
 
         .carousel-btn {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: white;
+            background: rgba(255, 179, 186, 0.7);
             border: none;
-            width: 45px;
-            height: 45px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            font-size: 24px;
+            font-size: 14px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 10;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s ease;
+            color: white;
+            transition: all 0.2s ease;
+            padding: 0;
         }
 
         .carousel-btn:hover {
-            background: #FFB3BA;
-            color: white;
-            box-shadow: 0 4px 12px rgba(255, 179, 186, 0.4);
+            background: rgba(255, 179, 186, 1);
         }
 
         .prev {
-            left: 15px;
+            left: 3px;
         }
 
         .next {
-            right: 15px;
+            right: 3px;
         }
 
         .carousel-btn:disabled {
-            opacity: 0.5;
+            opacity: 0.3;
             cursor: not-allowed;
         }
 
         .no-submissions {
             text-align: center;
             color: #999;
-            padding: 40px 20px;
-            font-size: 16px;
+            padding: 20px;
+            font-size: 12px;
+            width: 100%;
         }
 
         .loading {
             text-align: center;
             color: #999;
-            padding: 40px 20px;
-            font-size: 14px;
+            padding: 20px;
+            font-size: 12px;
+            width: 100%;
         }
 
         .modal {
@@ -145,7 +132,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 100;
             align-items: center;
             justify-content: center;
@@ -157,72 +144,46 @@
 
         .modal-content {
             position: relative;
-            max-width: 90%;
-            max-height: 90%;
+            max-width: 85vw;
+            max-height: 85vh;
         }
 
         .modal-content img {
             max-width: 100%;
             max-height: 100%;
-            border-radius: 10px;
+            border-radius: 4px;
         }
 
         .modal-close {
             position: absolute;
-            top: -40px;
-            right: 0;
-            background: white;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 179, 186, 0.8);
             border: none;
-            width: 40px;
-            height: 40px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            font-size: 28px;
+            font-size: 24px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: white;
         }
 
         .modal-close:hover {
             background: #FFB3BA;
-            color: white;
         }
 
         @media (max-width: 768px) {
             .carousel-image {
-                flex: 0 0 calc(33.333% - 10px);
-                min-width: 100px;
+                flex: 0 0 calc(25% - 1px);
             }
 
             .carousel-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
-
-            .prev {
-                left: 10px;
-            }
-
-            .next {
-                right: 10px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .carousel-image {
-                flex: 0 0 calc(50% - 7.5px);
-                min-width: 80px;
-            }
-
-            .carousel-container {
-                padding: 15px;
-            }
-
-            .carousel-btn {
-                width: 35px;
-                height: 35px;
-                font-size: 18px;
+                width: 20px;
+                height: 20px;
+                font-size: 12px;
             }
         }
     </style>
