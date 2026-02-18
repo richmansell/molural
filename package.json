@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node build.js",
     "dev": "node build.js && open shape_wall.html",
-    "convert-svg": "node svg-converter.js"
+    "convert-svg": "node svg-converter.js",
+    "fetch-gallery": "node scripts/fetch-discord-images.js"
   },
   "keywords": [
     "canvas",
@@ -15,5 +16,9 @@
     "drawing"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
 }
+

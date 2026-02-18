@@ -251,9 +251,8 @@
     </div>
 
     <script>
-        // Configuration - update with your Discord webhook URL
-        const DISCORD_WEBHOOK_URL = 'YOUR_DISCORD_WEBHOOK_URL_HERE';
-        const TIMEZONE_OFFSET = new Date().getTimezoneOffset();
+        // Configuration - pulls from git repo (no backend needed!)
+        const GALLERY_DATA_URL = 'https://cdn.jsdelivr.net/gh/richmansell/molural@main/gallery-data.json';
 
         class GalleryCarousel {
             constructor() {
@@ -282,20 +281,8 @@
             }
 
             loadGallery() {
-                // Try to load from Discord first
-                if (DISCORD_WEBHOOK_URL && DISCORD_WEBHOOK_URL !== 'YOUR_DISCORD_WEBHOOK_URL_HERE') {
-                    this.loadFromDiscord();
-                } else {
-                    this.showNoSubmissions();
-                }
-            }
-
-            loadFromDiscord() {
-                // Note: Discord webhooks are outbound only. For inbound, you'd need a backend.
-                // This shows how it would work with a backend API endpoint
-                const backendApiUrl = 'YOUR_BACKEND_API_URL_HERE'; // e.g., https://your-server.com/api/gallery
-
-                fetch(backendApiUrl)
+                // Fetch gallery data from GitHub repo
+                fetch(GALLERY_DATA_URL)
                     .then(response => {
                         if (!response.ok) throw new Error('Failed to load gallery');
                         return response.json();
@@ -324,10 +311,11 @@
 
                 this.images.forEach((imageData, index) => {
                     const img = document.createElement('img');
-                    img.src = imageData.url || imageData;
+                    img.src = imageData.url;
                     img.alt = `Gallery submission ${index + 1}`;
+                    img.title = imageData.timestamp;
                     img.className = 'carousel-image';
-                    img.addEventListener('click', () => this.openModal(imageData.url || imageData));
+                    img.addEventListener('click', () => this.openModal(imageData.url));
                     this.container.appendChild(img);
                 });
 
