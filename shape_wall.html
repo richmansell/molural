@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funky Shape Wall</title>
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    height: 100vh;
+    background: #f0f0f0;
+    gap: 20px;
+    padding: 20px;
+}
+
+.container {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    height: 100%;
+}
+
+.sidebar {
+    width: 280px;
+    background: white;
+    border-radius: 10px;
+    padding: 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 2px solid #eee;
+    flex-shrink: 0;
+}
+
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.main-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.canvas-container {
+    flex: 1;
+    background: linear-gradient(135deg, #a8d8ea 0%, #aa96da 100%);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><defs><pattern id="brick" width="100" height="100"><rect width="100" height="100" fill="%23c4a575"/><line x1="0" y1="0" x2="100" y2="0" stroke="%23a0845f" stroke-width="1"/><line x1="0" y1="100" x2="100" y2="100" stroke="%23a0845f" stroke-width="1"/><line x1="0" y1="0" x2="0" y2="100" stroke="%23a0845f" stroke-width="1"/><line x1="100" y1="0" x2="100" y2="100" stroke="%23a0845f" stroke-width="1"/><line x1="50" y1="0" x2="50" y2="100" stroke="%23a0845f" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23brick)"/></svg>');
+}
+
+h3 {
+    margin-top: 10px;
+    color: #333;
+    font-size: 14px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.shape-library {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.shape-item {
+    padding: 8px;
+    background: #f9f9f9;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    cursor: grab;
+    transition: all 0.2s;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    position: relative;
+}
+
+.shape-item:hover {
+    border-color: #666;
+    background: #fff;
+    transform: scale(1.02);
+}
+
+.shape-item:active {
+    cursor: grabbing;
+}
+
+.shape-preview {
+    width: 50px;
+    height: 50px;
+    display: block;
+}
+
+.shape-name {
+    font-size: 10px;
+    color: #666;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.shape-delete-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    font-size: 10px;
+    cursor: pointer;
+    display: none;
+}
+
+.shape-item:hover .shape-delete-btn {
+    display: block;
+}
+
+.controls {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.control-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="range"] {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, #FFB3BA, #BAE1FF);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: 2px solid #FFB3BA;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: 2px solid #FFB3BA;
+}
+
+.color-palette {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.color-box {
+    width: 100%;
+    aspect-ratio: 1;
+    border: 3px solid transparent;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.color-box:hover {
+    transform: scale(1.1);
+    border-color: #333;
+}
+
+.color-box.selected {
+    border-color: #333;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+button:hover {
+    background: #45a049;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.button-secondary {
+    background: #008CBA;
+    margin-top: 10px;
+}
+
+.button-secondary:hover {
+    background: #007399;
+}
+
+.info {
+    font-size: 12px;
+    color: #999;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 5px;
+    text-align: center;
+}
+
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Style & Colors</h3>
+                <div class="control-group">
+                    <label>Select Color</label>
+                    <div class="color-palette" id="colorPalette"></div>
+                </div>
+
+                <div class="control-group">
+                    <label for="opacitySlider">Opacity: <span id="opacityValue">60</span>%</label>
+                    <input type="range" id="opacitySlider" min="0" max="100" value="60">
+                </div>
+
+                <button id="saveBtn">📥 Save as JPEG</button>
+                <button class="button-secondary" id="clearBtn">🗑️ Clear All</button>
+            </div>
+
+            <div class="sidebar-content">
+                <h3>Shapes</h3>
+                <div class="shape-library" id="shapeLibrary"></div>
+            </div>
+        </div>
+
+        <div class="main-area">
+            <div class="canvas-container">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+// Shape definitions as functions that draw on canvas
+const shapeDefinitions = {
+    circle: {
+        name: 'Circle',
+        draw: (ctx, x, y, size, color) => {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    },
+    square: {
+        name: 'Square',
+        draw: (ctx, x, y, size, color) => {
+            ctx.fillStyle = color;
+            ctx.fillRect(x - size / 2, y - size / 2, size, size);
+        }
+    },
+    triangle: {
+        name: 'Triangle',
+        draw: (ctx, x, y, size, color) => {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x, y - size / 2);
+            ctx.lineTo(x + size / 2, y + size / 2);
+            ctx.lineTo(x - size / 2, y + size / 2);
+            ctx.closePath();
+            ctx.fill();
+        }
+    },
+    star: {
+        name: 'Star',
+        draw: (ctx, x, y, size, color) => {
+            const points = 5;
+            const innerRadius = size / 4;
+            const outerRadius = size / 2;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            for (let i = 0; i < points * 2; i++) {
+                const radius = i % 2 === 0 ? outerRadius : innerRadius;
+                const angle = (i * Math.PI) / points - Math.PI / 2;
+                const px = x + Math.cos(angle) * radius;
+                const py = y + Math.sin(angle) * radius;
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
+    },
+    hexagon: {
+        name: 'Hexagon',
+        draw: (ctx, x, y, size, color) => {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const angle = (i * Math.PI) / 3;
+                const px = x + Math.cos(angle) * (size / 2);
+                const py = y + Math.sin(angle) * (size / 2);
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
+    },
+    heart: {
+        name: 'Heart',
+        draw: (ctx, x, y, size, color) => {
+            const scale = size / 100;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x + 10 * scale, y + 35 * scale);
+            ctx.bezierCurveTo(x + 10 * scale, y + 10 * scale, x - 15 * scale, y - 10 * scale, x - 15 * scale, y - 10 * scale);
+            ctx.bezierCurveTo(x - 30 * scale, y - 10 * scale, x - 35 * scale, y + 10 * scale, x - 20 * scale, y + 25 * scale);
+            ctx.bezierCurveTo(x - 5 * scale, y + 35 * scale, x + 10 * scale, y + 50 * scale, x + 10 * scale, y + 50 * scale);
+            ctx.bezierCurveTo(x + 10 * scale, y + 50 * scale, x + 25 * scale, y + 35 * scale, x + 40 * scale, y + 25 * scale);
+            ctx.bezierCurveTo(x + 55 * scale, y + 10 * scale, x + 50 * scale, y - 10 * scale, x + 35 * scale, y - 10 * scale);
+            ctx.bezierCurveTo(x + 35 * scale, y - 10 * scale, x + 10 * scale, y + 10 * scale, x + 10 * scale, y + 35 * scale);
+            ctx.fill();
+        }
+    },
+    diamond: {
+        name: 'Diamond',
+        draw: (ctx, x, y, size, color) => {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x, y - size / 2);
+            ctx.lineTo(x + size / 2, y);
+            ctx.lineTo(x, y + size / 2);
+            ctx.lineTo(x - size / 2, y);
+            ctx.closePath();
+            ctx.fill();
+        }
+    },
+    wavy: {
+        name: 'Wavy Circle',
+        draw: (ctx, x, y, size, color) => {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            const points = 16;
+            for (let i = 0; i < points; i++) {
+                const angle = (i / points) * Math.PI * 2;
+                const radius = (size / 2) * (0.8 + 0.2 * Math.sin(angle * 4));
+                const px = x + Math.cos(angle) * radius;
+                const py = y + Math.sin(angle) * radius;
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
+    },
+    blob: {
+        name: 'Blob',
+        draw: (ctx, x, y, size, color) => {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            // Create a blobby organic shape using bezier curves
+            const scale = size / 100;
+            ctx.moveTo(x + 20 * scale, y - 40 * scale);
+            ctx.bezierCurveTo(x + 45 * scale, y - 45 * scale, x + 50 * scale, y - 20 * scale, x + 45 * scale, y + 10 * scale);
+            ctx.bezierCurveTo(x + 50 * scale, y + 25 * scale, x + 40 * scale, y + 45 * scale, x + 15 * scale, y + 45 * scale);
+            ctx.bezierCurveTo(x - 15 * scale, y + 40 * scale, x - 45 * scale, y + 25 * scale, x - 45 * scale, y);
+            ctx.bezierCurveTo(x - 50 * scale, y - 20 * scale, x - 30 * scale, y - 45 * scale, x + 10 * scale, y - 45 * scale);
+            ctx.closePath();
+            ctx.fill();
+        }
+    },
+    untitled: {
+        name: 'Untitled',
+        draw: (ctx, x, y, size, color) => {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            
+            // Scale factor: viewBox is 288x416 (width x height)
+            // Scale to fit within size x size square, using height as limiting dimension
+            const scale = size / 416; // 416 is the height (larger dimension)
+            const offsetX = -144; // Center X (288/2)
+            const offsetY = -208; // Center Y (416/2)
+            
+            const sx = (px) => x + (px + offsetX) * scale;
+            const sy = (py) => y + (py + offsetY) * scale;
+            
+            // Start point
+            ctx.moveTo(sx(203.881775), sy(61.657822));
+            
+            // Bezier curves from SVG path - preserving all detail
+            ctx.bezierCurveTo(sx(225.502975), sy(61.103149), sx(246.641037), sy(60.586517), sx(267.776215), sy(59.970444));
+            ctx.bezierCurveTo(sx(273.691040), sy(59.798031), sx(274.403015), sy(60.248177), sx(274.284180), sy(66.279533));
+            ctx.bezierCurveTo(sx(273.726776), sy(94.570030), sx(272.033203), sy(122.820747), sx(270.981445), sy(151.093246));
+            ctx.bezierCurveTo(sx(270.216461), sy(171.657516), sx(267.807373), sy(192.203918), sx(265.210144), sy(212.641220));
+            ctx.bezierCurveTo(sx(263.537750), sy(225.800888), sx(260.684875), sy(238.892105), sx(255.592438), sy(251.278152));
+            ctx.bezierCurveTo(sx(247.562347), sy(270.809235), sx(233.266983), sy(284.892334), sx(215.867447), sy(296.165161));
+            ctx.bezierCurveTo(sx(196.315796), sy(308.832336), sx(174.434586), sy(312.811768), sx(151.624176), sy(313.234222));
+            ctx.bezierCurveTo(sx(146.625687), sy(313.326813), sx(141.590546), sy(312.935242), sx(136.631866), sy(313.400970));
+            ctx.bezierCurveTo(sx(121.714111), sy(314.802185), sx(107.961967), sy(310.748932), sx(94.532516), sy(304.971344));
+            ctx.bezierCurveTo(sx(92.651970), sy(304.162323), sx(90.980927), sy(303.049835), sx(89.197968), sy(305.135315));
+            ctx.bezierCurveTo(sx(88.450294), sy(306.009796), sx(87.437523), sy(305.770081), sx(86.476028), sy(305.205872));
+            ctx.bezierCurveTo(sx(72.592239), sy(297.058472), sx(57.955708), sy(290.216125), sx(46.101395), sy(278.781433));
+            ctx.bezierCurveTo(sx(34.515705), sy(267.605865), sx(30.595001), sy(254.487213), sx(30.128117), sy(238.557022));
+            ctx.bezierCurveTo(sx(29.614080), sy(221.018158), sx(31.595436), sy(203.250885), sx(27.377857), sy(185.843292));
+            ctx.bezierCurveTo(sx(25.651068), sy(178.716187), sx(26.302794), sy(171.262207), sx(25.931833), sy(163.993713));
+            ctx.bezierCurveTo(sx(25.043547), sy(146.588852), sx(24.528318), sy(129.173355), sx(26.354170), sy(111.687408));
+            ctx.bezierCurveTo(sx(27.378212), sy(101.880280), sx(26.225548), sy(91.735107), sx(25.133205), sy(81.843887));
+            ctx.bezierCurveTo(sx(23.524773), sy(67.279465), sx(23.558905), sy(66.805298), sx(38.015377), sy(66.836739));
+            ctx.bezierCurveTo(sx(58.513756), sy(66.881317), sx(78.949959), sy(65.412201), sx(99.394775), sy(64.272346));
+            ctx.bezierCurveTo(sx(104.152054), sy(64.007111), sx(105.513420), sy(65.403313), sx(105.396782), sy(70.033066));
+            ctx.bezierCurveTo(sx(104.762939), sy(95.192711), sx(106.773796), sy(120.271599), sx(108.513268), sy(145.330948));
+            ctx.bezierCurveTo(sx(109.339226), sy(157.229965), sx(110.211891), sy(169.341904), sx(113.541107), sy(180.823349));
+            ctx.bezierCurveTo(sx(117.143913), sy(193.248306), sx(123.748055), sy(204.177292), sx(136.413040), sy(209.533615));
+            ctx.bezierCurveTo(sx(143.397690), sy(212.487595), sx(150.658463), sy(211.794754), sx(157.788177), sy(208.971252));
+            ctx.bezierCurveTo(sx(173.198990), sy(202.868317), sx(175.114441), sy(189.286499), sx(176.172729), sy(175.542725));
+            ctx.bezierCurveTo(sx(177.862839), sy(153.593735), sx(174.565018), sy(131.615082), sx(175.926147), sy(109.666641));
+            ctx.bezierCurveTo(sx(176.783157), sy(95.847015), sx(177.006302), sy(82.089218), sx(175.923996), sy(68.286934));
+            ctx.bezierCurveTo(sx(175.471680), sy(62.518417), sx(176.436722), sy(61.711555), sx(182.398392), sy(61.676525));
+            ctx.bezierCurveTo(sx(189.397919), sy(61.635395), sx(196.397812), sy(61.661366), sx(203.881775), sy(61.657822));
+            
+            ctx.closePath();
+            ctx.fill();
+        }
+    }
+};
+
+
+// SVG Shape utilities and rendering
+
+/**
+ * Renders an SVG string onto a canvas with a specific color
+ * Injects the color directly into the SVG before rendering
+ */
+function renderSvgOnCanvas(ctx, svgString, x, y, size, color) {
+    return new Promise((resolve, reject) => {
+        try {
+            // Inject color into the SVG by adding fill="color" to shape elements
+            let coloredSvg = svgString;
+            
+            // Add fill color to all shape elements that might not have it
+            coloredSvg = coloredSvg.replace(/<path\s/g, `<path fill="${color}" `);
+            coloredSvg = coloredSvg.replace(/<circle\s/g, `<circle fill="${color}" `);
+            coloredSvg = coloredSvg.replace(/<rect\s/g, `<rect fill="${color}" `);
+            coloredSvg = coloredSvg.replace(/<polygon\s/g, `<polygon fill="${color}" `);
+            coloredSvg = coloredSvg.replace(/<ellipse\s/g, `<ellipse fill="${color}" `);
+            coloredSvg = coloredSvg.replace(/<polyline\s/g, `<polyline fill="${color}" `);
+
+            // Handle elements that already have fill attribute - replace it
+            coloredSvg = coloredSvg.replace(/fill="[^"]*"/g, `fill="${color}"`);
+            coloredSvg = coloredSvg.replace(/fill='[^']*'/g, `fill='${color}'`);
+
+            // Create a canvas for rendering the SVG
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const tempCtx = canvas.getContext('2d');
+
+            // Create an image from the colored SVG
+            const svg = new Blob([coloredSvg], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(svg);
+            const img = new Image();
+
+            img.onload = () => {
+                try {
+                    // Draw the colored SVG onto the temp canvas
+                    tempCtx.drawImage(img, 0, 0, size, size);
+
+                    // Draw the SVG onto the main canvas
+                    ctx.drawImage(canvas, x - size / 2, y - size / 2, size, size);
+
+                    URL.revokeObjectURL(url);
+                    resolve();
+                } catch (err) {
+                    URL.revokeObjectURL(url);
+                    reject(err);
+                }
+            };
+
+            img.onerror = () => {
+                URL.revokeObjectURL(url);
+                reject(new Error('Failed to load SVG image'));
+            };
+
+            img.src = url;
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
+
+/**
+ * Convert hex color to RGB
+ */
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : { r: 255, g: 100, b: 100 };
+}
+
+/**
+ * Create a simple SVG shape from a string
+ */
+function svgString(content) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${content}</svg>`;
+}
+
+/**
+ * SVG Shape definitions
+ * You can:
+ * 1. Define SVG content inline (recommended for built-in shapes)
+ * 2. Load SVG files from URLs
+ * 3. Import hand-drawn SVGs from design tools
+ */
+const svgShapeDefinitions = {
+    // Note: For better performance, consider using canvas-drawn shapes instead of SVG rendering
+    // SVG rendering is async and can cause flickering. Use renderSvgOnCanvas() only for complex hand-drawn SVGs
+};
+
+/**
+ * Add a custom SVG shape
+ * @param {string} key - Unique identifier for the shape
+ * @param {string} name - Display name
+ * @param {string} svgContent - SVG string (should have viewBox="0 0 100 100")
+ */
+function addSvgShape(key, name, svgContent) {
+    svgShapeDefinitions[key] = {
+        name: name,
+        type: 'svg',
+        svg: svgContent,
+        draw: (ctx, x, y, size, color) => {
+            return renderSvgOnCanvas(ctx, svgContent, x, y, size, color);
+        }
+    };
+}
+
+/**
+ * Load an SVG shape from a URL
+ * @param {string} key - Unique identifier for the shape
+ * @param {string} name - Display name
+ * @param {string} url - URL to the SVG file
+ */
+function loadSvgShapeFromUrl(key, name, url) {
+    svgShapeDefinitions[key] = {
+        name: name,
+        type: 'svg',
+        url: url,
+        draw: (ctx, x, y, size, color) => {
+            return fetch(url)
+                .then(response => response.text())
+                .then(svgContent => renderSvgOnCanvas(ctx, svgContent, x, y, size, color))
+                .catch(err => console.error(`Failed to load SVG from ${url}:`, err));
+        }
+    };
+}
+
+// Add Blob shape as a hardcoded canvas drawing (instead of SVG for better performance)
+// This is loaded from shapes.js, so no need to re-define it here
+
+
+
+
+// Utility functions
+
+function getCorners(shape) {
+    const hw = shape.size / 2;
+    return {
+        tl: { x: shape.x - hw, y: shape.y - hw },
+        tr: { x: shape.x + hw, y: shape.y - hw },
+        bl: { x: shape.x - hw, y: shape.y + hw },
+        br: { x: shape.x + hw, y: shape.y + hw }
+    };
+}
+
+function getCornerAtPoint(shape, x, y, threshold = 15) {
+    // First check if the click is reasonably close to the shape center
+    // This prevents corners of unrelated shapes from being detected
+    const distToCenter = Math.sqrt((x - shape.x) ** 2 + (y - shape.y) ** 2);
+    const hw = shape.size / 2;
+    
+    // Only check corners if click is within ~1.5x the half-width of the shape
+    // This ensures we don't trigger corners on distant rotated shapes
+    if (distToCenter > hw * 1.5 + threshold) {
+        return null;
+    }
+    
+    const corners = getCorners(shape);
+
+    for (const [key, corner] of Object.entries(corners)) {
+        const dist = Math.sqrt((x - corner.x) ** 2 + (y - corner.y) ** 2);
+        if (dist < threshold) {
+            return key;
+        }
+    }
+    return null;
+}
+
+function createBrickPatternCanvas() {
+    const p = document.createElement('canvas');
+    p.width = 100;
+    p.height = 100;
+    const pCtx = p.getContext('2d');
+    pCtx.fillStyle = '#c4a575';
+    pCtx.fillRect(0, 0, 100, 100);
+    pCtx.strokeStyle = '#a0845f';
+    pCtx.lineWidth = 1;
+    pCtx.strokeRect(0, 0, 100, 100);
+    pCtx.fillRect(50, 0, 50, 50);
+    pCtx.strokeRect(50, 0, 50, 50);
+    pCtx.fillRect(0, 50, 50, 50);
+    pCtx.strokeRect(0, 50, 50, 50);
+    pCtx.fillRect(50, 50, 50, 50);
+    pCtx.strokeRect(50, 50, 50, 50);
+    return p;
+}
+
+
+// Canvas rendering and interaction
+
+const CORNER_SIZE = 10;
+const ORIGINAL_IMAGE_INTERACTIVE_HEIGHT = 393; // Interactive area height in original image
+const SHAPE_SCALE = 3; // Shapes are 3x bigger
+const BASE_SIZE = 80; // Base size when dragged (gets multiplied by SHAPE_SCALE)
+let SHAPE_OPACITY = 0.6; // 60% opacity (can be changed via slider)
+
+class CanvasManager {
+    constructor(canvasElement) {
+        this.canvas = canvasElement;
+        this.ctx = this.canvas.getContext('2d');
+        this.shapes = [];
+        this.selectedShapeIndex = -1;
+        this.draggingShapeIndex = -1;
+        this.dragOffsetX = 0;
+        this.dragOffsetY = 0;
+        this.resizingCorner = null;
+        this.resizeStartSize = 0;
+        this.resizeStartX = 0;
+        this.resizeStartY = 0;
+        this.rotatingShapeIndex = -1;
+        this.rotationStartX = 0;
+        this.rotationStartRotation = 0;
+        this.backgroundImage = null;
+        this.backgroundLoaded = false;
+        this.interactiveHeightScaled = 393; // Fallback
+
+        this.loadBackgroundImage();
+        this.setupEventListeners();
+    }
+
+    getInteractiveHeight() {
+        // Calculate proportional interactive height based on image dimensions
+        if (this.backgroundImage) {
+            return (ORIGINAL_IMAGE_INTERACTIVE_HEIGHT / this.backgroundImage.height) * this.canvas.height;
+        }
+        return ORIGINAL_IMAGE_INTERACTIVE_HEIGHT;
+    }
+
+    loadBackgroundImage() {
+        const img = new Image();
+        img.onload = () => {
+            this.backgroundImage = img;
+            this.backgroundLoaded = true;
+            this.interactiveHeightScaled = this.getInteractiveHeight();
+            this.redraw();
+        };
+        img.onerror = () => {
+            console.warn('Failed to load background image');
+            this.backgroundLoaded = true; // Still set as loaded so we can continue
+        };
+        img.src = 'bg/image.png';
+    }
+
+    setupEventListeners() {
+        this.canvas.addEventListener('dragover', (e) => this.handleDragOver(e));
+        this.canvas.addEventListener('drop', (e) => this.handleDrop(e));
+        this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+        this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+        this.canvas.addEventListener('mouseup', () => this.handleMouseUp());
+        document.addEventListener('keydown', (e) => this.handleKeyDown(e));
+    }
+
+    handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+    }
+
+    handleDrop(e) {
+        e.preventDefault();
+        
+        // Clear ALL ongoing interaction operations to prevent shapes from being linked
+        this.draggingShapeIndex = -1;
+        this.resizingCorner = null;
+        this.rotatingShapeIndex = -1;
+        this.selectedShapeIndex = -1;  // Deselect any previously selected shape
+        
+        const shapeKey = e.dataTransfer.getData('shapeKey');
+        const rect = this.canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Only allow drops in the interactive area
+        const interactiveHeight = this.getInteractiveHeight();
+        if (y > interactiveHeight) return;
+
+        const shape = {
+            key: shapeKey,
+            x: x,
+            y: y,
+            size: BASE_SIZE * SHAPE_SCALE,
+            color: typeof uiManager !== 'undefined' ? uiManager.currentColor : '#FFB3BA',
+            rotation: 0  // Explicitly set rotation to 0
+        };
+
+        this.shapes.push(shape);
+        this.selectedShapeIndex = this.shapes.length - 1;
+        if (typeof uiManager !== 'undefined') {
+            uiManager.onShapeSelected(this.selectedShapeIndex);
+        }
+        this.redraw();
+    }
+
+    handleMouseDown(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const interactiveHeight = this.getInteractiveHeight();
+        
+        // Check if clicking on rotation handle
+        if (this.selectedShapeIndex >= 0) {
+            const shape = this.shapes[this.selectedShapeIndex];
+            const rotationHandleY = shape.y - shape.size / 2 - 30;
+            const rotationHandleX = shape.x;
+            const handleRadius = 8;
+            
+            const distToHandle = Math.sqrt((x - rotationHandleX) ** 2 + (y - rotationHandleY) ** 2);
+            if (distToHandle < handleRadius) {
+                this.rotatingShapeIndex = this.selectedShapeIndex;
+                this.rotationStartX = x;
+                this.rotationStartRotation = shape.rotation || 0;
+                return;
+            }
+        }
+        
+        // Only allow interaction in the interactive area
+        if (y > interactiveHeight) return;
+
+        // Check if clicking on a resize corner of the selected shape
+        if (this.selectedShapeIndex >= 0) {
+            const shape = this.shapes[this.selectedShapeIndex];
+            const corner = getCornerAtPoint(shape, x, y);
+            if (corner) {
+                this.resizingCorner = corner;
+                this.resizeStartSize = shape.size;
+                this.resizeStartX = x;
+                this.resizeStartY = y;
+                this.resizeStartX_shape = shape.x;
+                this.resizeStartY_shape = shape.y;
+                return;
+            }
+        }
+
+        // Check if clicking on any shape
+        for (let i = this.shapes.length - 1; i >= 0; i--) {
+            const shape = this.shapes[i];
+            const dist = Math.sqrt((x - shape.x) ** 2 + (y - shape.y) ** 2);
+            if (dist < shape.size / 2 + 10) {
+                this.selectedShapeIndex = i;
+                this.draggingShapeIndex = i;
+                this.dragOffsetX = x - shape.x;
+                this.dragOffsetY = y - shape.y;
+                if (typeof uiManager !== 'undefined') {
+                    uiManager.onShapeSelected(this.selectedShapeIndex);
+                }
+                this.redraw();
+                return;
+            }
+        }
+
+        this.selectedShapeIndex = -1;
+        this.redraw();
+    }
+
+    handleMouseMove(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const interactiveHeight = this.getInteractiveHeight();
+
+        // Handle rotation - drag left/right on rotation handle
+        if (this.rotatingShapeIndex >= 0) {
+            const shape = this.shapes[this.rotatingShapeIndex];
+            const deltaX = x - this.rotationStartX;
+            // Rotate based on horizontal movement: 1px = 1 degree
+            shape.rotation = (this.rotationStartRotation + deltaX) % 360;
+            if (shape.rotation < 0) shape.rotation += 360;
+            this.redraw();
+            return;
+        }
+
+        // Handle resizing - corner-specific resize
+        if (this.resizingCorner && this.selectedShapeIndex >= 0) {
+            const shape = this.shapes[this.selectedShapeIndex];
+            const corner = this.resizingCorner;
+            const dx = x - this.resizeStartX;
+            const dy = y - this.resizeStartY;
+
+            // Move the center and adjust size based on which corner is being dragged
+            if (corner === 'tl') {
+                shape.x = this.resizeStartX_shape - dx / 2;
+                shape.y = this.resizeStartY_shape - dy / 2;
+                shape.size = this.resizeStartSize - Math.sqrt(dx * dx + dy * dy);
+            } else if (corner === 'tr') {
+                shape.x = this.resizeStartX_shape + dx / 2;
+                shape.y = this.resizeStartY_shape - dy / 2;
+                // Grow when dragging right/up, shrink when dragging left/down
+                const sizeChange = (dx - dy) / 2;
+                shape.size = this.resizeStartSize + sizeChange;
+            } else if (corner === 'bl') {
+                shape.x = this.resizeStartX_shape - dx / 2;
+                shape.y = this.resizeStartY_shape + dy / 2;
+                // Grow when dragging left/down, shrink when dragging right/up
+                const sizeChange = (dy - dx) / 2;
+                shape.size = this.resizeStartSize + sizeChange;
+            } else if (corner === 'br') {
+                shape.x = this.resizeStartX_shape + dx / 2;
+                shape.y = this.resizeStartY_shape + dy / 2;
+                // Grow when dragging right/down, shrink when dragging left/up
+                const sizeChange = (dx + dy) / 2;
+                shape.size = this.resizeStartSize + sizeChange;
+            }
+            
+            shape.size = Math.max(40, shape.size);
+            this.redraw();
+            return;
+        }
+
+        // Handle dragging - allow shapes to go below interactive area (will be clipped)
+        if (this.draggingShapeIndex >= 0) {
+            const shape = this.shapes[this.draggingShapeIndex];
+            shape.x = x - this.dragOffsetX;
+            shape.y = y - this.dragOffsetY;
+            this.redraw();
+            return;
+        }
+
+        // Only allow selection in the interactive area
+        if (y > interactiveHeight) return;
+
+        // Check for rotation handle hover
+        if (this.selectedShapeIndex >= 0) {
+            const shape = this.shapes[this.selectedShapeIndex];
+            const rotationHandleY = shape.y - shape.size / 2 - 30;
+            const rotationHandleX = shape.x;
+            const handleRadius = 8;
+            
+            const distToHandle = Math.sqrt((x - rotationHandleX) ** 2 + (y - rotationHandleY) ** 2);
+            if (distToHandle < handleRadius) {
+                this.canvas.style.cursor = 'grab';
+                return;
+            }
+        }
+
+        // Update cursor based on what's under mouse
+        if (this.selectedShapeIndex >= 0 && this.resizingCorner === null) {
+            const shape = this.shapes[this.selectedShapeIndex];
+            const corner = getCornerAtPoint(shape, x, y);
+            if (corner) {
+                if (corner === 'tl' || corner === 'br') {
+                    this.canvas.style.cursor = 'nwse-resize';
+                } else if (corner === 'tr' || corner === 'bl') {
+                    this.canvas.style.cursor = 'nesw-resize';
+                }
+                return;
+            }
+        }
+        this.canvas.style.cursor = 'crosshair';
+    }
+
+    handleMouseUp() {
+        this.draggingShapeIndex = -1;
+        this.resizingCorner = null;
+        this.rotatingShapeIndex = -1;
+    }
+
+    handleKeyDown(e) {
+        // Rotate selected shape with + and - keys
+        if (this.selectedShapeIndex >= 0) {
+            const shape = this.shapes[this.selectedShapeIndex];
+            if (!shape.rotation) shape.rotation = 0;
+            
+            if (e.key === '+' || e.key === '=') {
+                e.preventDefault();
+                shape.rotation = (shape.rotation + 15) % 360;
+                this.redraw();
+            } else if (e.key === '-' || e.key === '_') {
+                e.preventDefault();
+                shape.rotation = (shape.rotation - 15 + 360) % 360;
+                this.redraw();
+            } else if (e.key === 'Delete' || e.key === 'Backspace') {
+                e.preventDefault();
+                this.deleteShape(this.selectedShapeIndex);
+            }
+        }
+    }
+
+    deleteShape(index) {
+        if (index >= 0 && index < this.shapes.length) {
+            this.shapes.splice(index, 1);
+            if (this.selectedShapeIndex === index) {
+                this.selectedShapeIndex = -1;
+            } else if (this.selectedShapeIndex > index) {
+                this.selectedShapeIndex--;
+            }
+            this.redraw();
+        }
+    }
+
+    redraw() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Draw background image if loaded, otherwise fallback to color
+        if (this.backgroundLoaded && this.backgroundImage) {
+            this.ctx.drawImage(this.backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
+        } else {
+            this.ctx.fillStyle = '#f0f0f0';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+
+        // Save context state
+        this.ctx.save();
+        
+        // Set clipping region so shapes are cut off at boundary
+        const interactiveHeight = this.getInteractiveHeight();
+        this.ctx.beginPath();
+        this.ctx.rect(0, 0, this.canvas.width, this.canvas.height); // Full height canvas so shapes can extend beyond
+        this.ctx.clip();
+        
+        this.ctx.globalAlpha = SHAPE_OPACITY;
+
+        // Draw all shapes sequentially to prevent context transform issues
+        let shapeDrawIndex = 0;
+        const drawNextShape = () => {
+            if (shapeDrawIndex < this.shapes.length) {
+                this.drawShape(this.shapes[shapeDrawIndex]);
+                shapeDrawIndex++;
+                drawNextShape();
+            } else {
+                // All shapes drawn, restore context and draw UI
+                this.ctx.restore(); // Restore context state (opacity and clipping)
+                
+                // Draw selection UI
+                this.drawSelectionUI();
+                
+                // Overlay the bottom part of background image to cover any shapes below the boundary
+                if (this.backgroundLoaded && this.backgroundImage) {
+                    this.ctx.globalAlpha = 1.0;
+                    const srcHeight = this.backgroundImage.height;
+                    const overlayStartY = interactiveHeight;
+                    const srcOverlayStartY = ORIGINAL_IMAGE_INTERACTIVE_HEIGHT;
+                    const overlayHeight = this.canvas.height - interactiveHeight;
+                    const srcOverlayHeight = srcHeight - srcOverlayStartY;
+                    
+                    if (overlayHeight > 0 && srcOverlayHeight > 0) {
+                        // Draw the bottom portion of the background image to cover shapes
+                        this.ctx.drawImage(
+                            this.backgroundImage,
+                            0, srcOverlayStartY,
+                            this.backgroundImage.width, srcOverlayHeight,
+                            0, overlayStartY,
+                            this.canvas.width, overlayHeight
+                        );
+                    }
+                }
+            }
+        };
+        drawNextShape();
+
+        // Update cached interactive height
+        this.interactiveHeightScaled = this.getInteractiveHeight();
+    }
+
+    drawShape(shape) {
+        const shapeDef = shapeDefinitions[shape.key] || svgShapeDefinitions[shape.key];
+        if (!shapeDef) return;
+
+        // Save context for rotation
+        this.ctx.save();
+        
+        // Apply rotation
+        this.ctx.translate(shape.x, shape.y);
+        this.ctx.rotate((shape.rotation || 0) * Math.PI / 180);
+        this.ctx.translate(-shape.x, -shape.y);
+
+        shapeDef.draw(this.ctx, shape.x, shape.y, shape.size, shape.color);
+        
+        // Restore context after drawing
+        this.ctx.restore();
+    }
+
+    drawSelectionUI() {
+        // Draw interactive area boundary line
+        const interactiveHeight = this.getInteractiveHeight();
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, interactiveHeight);
+        this.ctx.lineTo(this.canvas.width, interactiveHeight);
+        this.ctx.stroke();
+
+        if (this.selectedShapeIndex < 0) return;
+
+        const shape = this.shapes[this.selectedShapeIndex];
+        
+        // Draw bounding box selection
+        const hw = shape.size / 2;
+        this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+        this.ctx.lineWidth = 3;
+        this.ctx.setLineDash([5, 5]);
+        this.ctx.strokeRect(shape.x - hw - 8, shape.y - hw - 8, shape.size + 16, shape.size + 16);
+        this.ctx.setLineDash([]);
+
+        // Draw corner resize handles
+        const corners = getCorners(shape);
+        this.ctx.fillStyle = '#4CAF50';
+        this.ctx.strokeStyle = 'white';
+        this.ctx.lineWidth = 2;
+
+        for (const corner of Object.values(corners)) {
+            this.ctx.fillRect(corner.x - CORNER_SIZE / 2, corner.y - CORNER_SIZE / 2, CORNER_SIZE, CORNER_SIZE);
+            this.ctx.strokeRect(corner.x - CORNER_SIZE / 2, corner.y - CORNER_SIZE / 2, CORNER_SIZE, CORNER_SIZE);
+        }
+        
+        // Draw rotation handle at top of shape
+        const rotationHandleY = shape.y - shape.size / 2 - 30;
+        const rotationHandleX = shape.x;
+        const handleRadius = 8;
+        
+        this.ctx.fillStyle = '#2196F3';
+        this.ctx.strokeStyle = 'white';
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath();
+        this.ctx.arc(rotationHandleX, rotationHandleY, handleRadius, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+        // Draw line from shape to handle
+        this.ctx.strokeStyle = 'rgba(33, 150, 243, 0.5)';
+        this.ctx.lineWidth = 1;
+        this.ctx.setLineDash([3, 3]);
+        this.ctx.beginPath();
+        this.ctx.moveTo(shape.x, shape.y - shape.size / 2);
+        this.ctx.lineTo(shape.x, rotationHandleY);
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+    }
+
+    resizeCanvas() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
+        this.redraw();
+    }
+
+    clearShapes() {
+        if (this.shapes.length > 0 && confirm('Are you sure you want to clear all shapes?')) {
+            this.shapes = [];
+            this.selectedShapeIndex = -1;
+            this.redraw();
+        }
+    }
+
+    saveAsJpeg() {
+        const link = document.createElement('a');
+        link.href = this.canvas.toDataURL('image/jpeg', 0.95);
+        link.download = 'shape_wall_' + new Date().toISOString().slice(0, 10) + '.jpg';
+        link.click();
+    }
+
+    updateSelectedShapeColor(color) {
+        if (this.selectedShapeIndex >= 0) {
+            this.shapes[this.selectedShapeIndex].color = color;
+            this.redraw();
+        }
+    }
+}
+
+
+// UI interactions
+
+// 10 beautiful pastel colors
+const PASTEL_COLORS = [
+    '#FFB3BA', // Pastel Pink
+    '#FFCCCB', // Pastel Red
+    '#FFDFBA', // Pastel Orange
+    '#FFFFBA', // Pastel Yellow
+    '#BAFFC9', // Pastel Green
+    '#BAE1FF', // Pastel Blue
+    '#E0BBE4', // Pastel Purple
+    '#C9BAFF', // Pastel Lavender
+    '#FFC9E3', // Pastel Magenta
+    '#D4C5B9'  // Pastel Brown
+];
+
+class UIManager {
+    constructor(canvasManager) {
+        this.canvasManager = canvasManager;
+        this.colorPalette = document.getElementById('colorPalette');
+        this.opacitySlider = document.getElementById('opacitySlider');
+        this.opacityValue = document.getElementById('opacityValue');
+        this.saveBtn = document.getElementById('saveBtn');
+        this.clearBtn = document.getElementById('clearBtn');
+        this.shapeLibrary = document.getElementById('shapeLibrary');
+        this.currentColor = PASTEL_COLORS[0];
+        this.previewCanvases = new Map(); // Store preview canvases by shape key
+
+        this.setupEventListeners();
+        this.initializeColorPalette();
+        this.initializeShapeLibrary();
+    }
+
+    setupEventListeners() {
+        this.saveBtn.addEventListener('click', () => this.handleSave());
+        this.clearBtn.addEventListener('click', () => this.handleClear());
+        this.opacitySlider.addEventListener('input', (e) => this.handleOpacityChange(e));
+    }
+
+    handleOpacityChange(e) {
+        const opacity = parseInt(e.target.value);
+        SHAPE_OPACITY = opacity / 100;
+        this.opacityValue.textContent = opacity;
+        this.canvasManager.redraw();
+    }
+
+    initializeColorPalette() {
+        PASTEL_COLORS.forEach((color, index) => {
+            const box = document.createElement('div');
+            box.className = 'color-box';
+            if (index === 0) box.classList.add('selected');
+            box.style.backgroundColor = color;
+            box.title = color;
+
+            box.addEventListener('click', () => {
+                // Remove selected from all boxes
+                document.querySelectorAll('.color-box').forEach(b => b.classList.remove('selected'));
+                // Add selected to this box
+                box.classList.add('selected');
+                // Update color
+                this.currentColor = color;
+                // Redraw all previews with new color
+                this.updateAllPreviewColors(color);
+                // Update selected shape if any
+                if (this.canvasManager.selectedShapeIndex >= 0) {
+                    this.canvasManager.updateSelectedShapeColor(color);
+                }
+            });
+
+            this.colorPalette.appendChild(box);
+        });
+    }
+
+    updateAllPreviewColors(color) {
+        this.previewCanvases.forEach((canvas, shapeKey) => {
+            const shape = shapeDefinitions[shapeKey] || svgShapeDefinitions[shapeKey];
+            if (shape) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const drawResult = shape.draw(ctx, 25, 25, 40, color);
+                Promise.resolve(drawResult);
+            }
+        });
+    }
+
+    initializeShapeLibrary() {
+        // Add canvas-drawn shapes
+        Object.entries(shapeDefinitions).forEach(([key, shape]) => {
+            this.addShapeToLibrary(key, shape);
+        });
+
+        // Add SVG shapes
+        Object.entries(svgShapeDefinitions).forEach(([key, shape]) => {
+            this.addShapeToLibrary(key, shape);
+        });
+    }
+
+    addShapeToLibrary(key, shape) {
+        const item = document.createElement('div');
+        item.className = 'shape-item';
+        item.draggable = true;
+        item.dataset.shapeKey = key;
+
+        // Create canvas preview
+        const previewCanvas = document.createElement('canvas');
+        previewCanvas.width = 50;
+        previewCanvas.height = 50;
+        previewCanvas.className = 'shape-preview';
+        const previewCtx = previewCanvas.getContext('2d');
+
+        // Store reference to preview canvas for color updates
+        this.previewCanvases.set(key, previewCanvas);
+
+        // Draw preview
+        const drawResult = shape.draw(previewCtx, 25, 25, 40, '#FFB3BA');
+        
+        // Handle async SVG drawing
+        Promise.resolve(drawResult).then(() => {
+            // Preview is drawn
+        });
+
+        const nameDiv = document.createElement('div');
+        nameDiv.className = 'shape-name';
+        nameDiv.textContent = shape.name;
+
+        item.appendChild(previewCanvas);
+        item.appendChild(nameDiv);
+
+        item.addEventListener('dragstart', (e) => {
+            e.dataTransfer.effectAllowed = 'copy';
+            e.dataTransfer.setData('shapeKey', key);
+            e.dataTransfer.setDragImage(previewCanvas, 25, 25);
+        });
+
+        this.shapeLibrary.appendChild(item);
+    }
+
+    handleSave() {
+        this.canvasManager.saveAsJpeg();
+    }
+
+    handleClear() {
+        this.canvasManager.clearShapes();
+    }
+
+    onShapeSelected(index) {
+        if (index >= 0 && index < this.canvasManager.shapes.length) {
+            const shape = this.canvasManager.shapes[index];
+            this.currentColor = shape.color;
+            
+            // Update color palette selection
+            const selectedBox = document.querySelector('.color-box.selected');
+            if (selectedBox) selectedBox.classList.remove('selected');
+            
+            const colorIndex = PASTEL_COLORS.indexOf(shape.color);
+            if (colorIndex >= 0) {
+                document.querySelectorAll('.color-box')[colorIndex].classList.add('selected');
+            }
+        }
+    }
+
+    deleteShapeOnCanvas(event, shapeIndex) {
+        event.stopPropagation();
+        event.preventDefault();
+        this.canvasManager.deleteShape(shapeIndex);
+    }
+}
+
+
+// Main initialization
+
+let canvasManager;
+let uiManager;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('canvas');
+    
+    canvasManager = new CanvasManager(canvas);
+    uiManager = new UIManager(canvasManager);
+
+    // Resize canvas to fit container
+    window.addEventListener('resize', () => canvasManager.resizeCanvas());
+    canvasManager.resizeCanvas();
+
+    // Keyboard support
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+            if (canvasManager.selectedShapeIndex >= 0) {
+                canvasManager.deleteShape(canvasManager.selectedShapeIndex);
+            }
+        }
+    });
+});
+
+</script>
+</body>
+</html>
