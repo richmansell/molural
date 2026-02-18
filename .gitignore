@@ -1,0 +1,20 @@
+# Generated files
+shape_wall.html
+output/
+
+# User input
+input/
+
+# Dependencies
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

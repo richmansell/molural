@@ -1,0 +1,63 @@
+PROJECT STRUCTURE - CLEANED UP
+===============================
+
+ROOT - Essential Files Only
+============================
+shape_wall.html              - The app - open in browser
+README.md                    - Quick overview
+ADD_SHAPES_SIMPLE.md         - How to add shapes (3-step PNG→SVG→App)
+
+BUILD & AUTOMATION
+==================
+build.js                     - Merges src/ into shape_wall.html
+svg-converter.js             - Converts SVG files to addSvgShape() calls
+package.json                 - NPM scripts and config
+
+INPUT / OUTPUT FOLDERS
+======================
+input/                       - Drop your SVG files here
+output/                      - Generated JavaScript code appears here
+
+SOURCE CODE
+===========
+src/
+  ├── index.html             - HTML template
+  ├── css/style.css          - All styling
+  └── js/
+      ├── shapes.js          - 8 built-in shapes
+      ├── svg-shapes.js      - Your custom SVG shapes (add addSvgShape() calls)
+      ├── canvas.js          - Canvas rendering & interaction
+      ├── ui.js              - UI controls & color palette
+      ├── utils.js           - Helper functions
+      └── main.js            - Initialization
+
+ARCHIVED DOCS (Reference Only)
+==============================
+docs/
+  ├── SVG_CONVERTER_GUIDE.md  - How to use the automation (START HERE!)
+  ├── DOCS_ARCHIVED.md        - Index of all archived documentation
+  ├── QUICK_START.md          - Original getting-started guide
+  ├── SHAPES_GUIDE.md         - Detailed shape development guide
+  ├── SVG_TECHNICAL.md        - Technical architecture details
+  ├── PROJECT_STRUCTURE.txt   - Old structure notes
+  ├── FILES_SUMMARY.txt       - File descriptions
+  └── EXAMPLE_SHAPES.js       - Example SVG shapes (reference)
+
+AUTOMATION WORKFLOW - THE MAGIC!
+================================
+This is what you asked for: Automation!
+
+1. Drop SVG files in input/
+2. Run:  npm run convert-svg
+3. Get JavaScript code in output/svg-shapes-to-add.js
+4. Copy addSvgShape() calls into src/js/svg-shapes.js
+5. Run:  npm run build
+6. Open shape_wall.html
+
+See your new shapes instantly!
+
+QUICK COMMANDS
+==============
+npm run build              - Rebuild shape_wall.html from src/
+npm run dev                - Build and auto-open in browser
+npm run convert-svg        - Convert SVG files to addSvgShape() calls

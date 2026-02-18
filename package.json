@@ -1,0 +1,19 @@
+{
+  "name": "funky-shape-wall",
+  "version": "1.0.0",
+  "description": "An interactive HTML5 canvas application for creating and customizing funky shapes on a wall",
+  "main": "shape_wall.html",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js && open shape_wall.html",
+    "convert-svg": "node svg-converter.js"
+  },
+  "keywords": [
+    "canvas",
+    "shapes",
+    "interactive",
+    "drawing"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,46 @@
+FUNKY SHAPE WALL - Files Summary
+=================================
+
+ESSENTIAL FILES
+===============
+
+shape_wall.html              - The app - Open this in your browser
+README.md                    - Project overview & how to use
+ADD_SHAPES_SIMPLE.md         - Simple guide: PNG to SVG to App (3 steps)
+
+SOURCE CODE (For Developers)
+============================
+
+Build System:
+  build.js                   - Merges src/ into shape_wall.html
+  package.json               - NPM config
+
+Source Folder (src/):
+  index.html                 - HTML template
+  css/style.css              - All styling
+  js/shapes.js               - 8 built-in shapes
+  js/svg-shapes.js           - Your custom SVG shapes go here
+  js/canvas.js               - Canvas rendering
+  js/ui.js                   - UI & colors
+  js/utils.js                - Helper functions
+  js/main.js                 - Initialization
+
+ARCHIVED / OPTIONAL
+===================
+
+  DOCS_ARCHIVED.md           - Index of archived detailed docs
+  QUICK_START.md             - (Use ADD_SHAPES_SIMPLE.md instead)
+  SHAPES_GUIDE.md            - Detailed shape guide
+  SVG_TECHNICAL.md           - Technical details
+  EXAMPLE_SHAPES.js          - Example SVGs (reference)
+  PROJECT_STRUCTURE.txt      - Old structure notes
+  FILES_SUMMARY.txt          - This file
+
+QUICK START
+===========
+
+1. Open shape_wall.html in your browser - done!
+2. Draw and have fun
+3. To add your own shapes:
+   - Read ADD_SHAPES_SIMPLE.md
+   - Takes 2 minutes

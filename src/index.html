@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funky Shape Wall</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Style & Colors</h3>
+                <div class="control-group">
+                    <label>Select Color</label>
+                    <div class="color-palette" id="colorPalette"></div>
+                </div>
+
+                <div class="control-group">
+                    <label for="opacitySlider">Opacity: <span id="opacityValue">60</span>%</label>
+                    <input type="range" id="opacitySlider" min="0" max="100" value="60">
+                </div>
+
+                <button id="saveBtn">📥 Save as JPEG</button>
+                <button class="button-secondary" id="clearBtn">🗑️ Clear All</button>
+            </div>
+
+            <div class="sidebar-content">
+                <h3>Shapes</h3>
+                <div class="shape-library" id="shapeLibrary"></div>
+            </div>
+        </div>
+
+        <div class="main-area">
+            <div class="canvas-container">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script files -->
+    <script src="js/shapes.js"></script>
+    <script src="js/svg-shapes.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/canvas.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
