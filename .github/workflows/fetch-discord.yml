@@ -7,6 +7,9 @@ on:
   # Allow manual triggering
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   fetch-images:
     runs-on: ubuntu-latest
@@ -27,11 +30,15 @@ jobs:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
         run: node scripts/fetch-discord-images.js
       
-      - name: Commit changes
+      - name: Configure git
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+      
+      - name: Commit and push changes
+        run: |
           git add gallery-data.json
-          git commit -m "Update gallery images from Discord" --allow-empty
+          git commit -m "Update gallery images from Discord [skip ci]" --allow-empty
           git push
-        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
