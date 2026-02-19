@@ -40,6 +40,7 @@ class CanvasManager {
 
     loadBackgroundImage() {
         const img = new Image();
+        img.src = BG_IMAGE_DATA_URL;  // Use embedded data URL (no CORS issues)
         img.onload = () => {
             this.backgroundImage = img;
             this.backgroundLoaded = true;
@@ -48,9 +49,8 @@ class CanvasManager {
         };
         img.onerror = () => {
             console.warn('Failed to load background image');
-            this.backgroundLoaded = true; // Still set as loaded so we can continue
+            this.backgroundLoaded = true;
         };
-        img.src = 'bg/image.png';
     }
 
     setupEventListeners() {

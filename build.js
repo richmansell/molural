@@ -18,10 +18,17 @@ const css = fs.readFileSync(cssPath, 'utf8');
 // Read JS files in order
 const jsDir = path.join(srcDir, 'js');
 const jsFiles = ['shapes.js', 'svg-shapes.js', 'utils.js', 'canvas.js', 'ui.js', 'main.js'];
-const scripts = jsFiles.map(file => {
+let scripts = jsFiles.map(file => {
     const filePath = path.join(jsDir, file);
     return fs.readFileSync(filePath, 'utf8');
 }).join('\n\n');
+
+// Embed background image as data URL to avoid CORS taint
+const bgImagePath = path.join(__dirname, 'bg', 'image.png');
+const bgImageBase64 = fs.readFileSync(bgImagePath).toString('base64');
+const bgDataUrl = `data:image/png;base64,${bgImageBase64}`;
+const bgConstant = `\nconst BG_IMAGE_DATA_URL = '${bgDataUrl}';\n`;
+scripts = bgConstant + scripts;
 
 // Replace link tag with style tag
 html = html.replace(
