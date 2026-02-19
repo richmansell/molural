@@ -17,3 +17,11 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# Tokens
+*.env
+*.env.local
+*.env.development
+*.env.test
+*.env.production
+tokens/
