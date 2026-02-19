@@ -2,8 +2,8 @@ name: Fetch Discord Gallery Images
 
 on:
   schedule:
-    # Run every hour
-    - cron: '0 * * * *'
+    # Run every minute
+    - cron: '* * * * *'
   # Allow manual triggering
   workflow_dispatch:
 
