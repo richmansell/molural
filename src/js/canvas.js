@@ -303,13 +303,11 @@ class CanvasManager {
     redraw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Draw background image if loaded, otherwise fallback to color
+        // Draw background image if loaded, otherwise fallback to transparent
         if (this.backgroundLoaded && this.backgroundImage) {
             this.ctx.drawImage(this.backgroundImage, 0, 0, this.canvas.width, this.canvas.height);
-        } else {
-            this.ctx.fillStyle = '#f0f0f0';
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         }
+        // No fallback background - canvas remains transparent
 
         // Save context state
         this.ctx.save();
