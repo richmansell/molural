@@ -124,29 +124,38 @@ class UIManager {
     }
 
     handleSubmit() {
-        // Get canvas as blob and send to Discord
+        // Convert canvas to JPEG blob
         this.canvasManager.canvas.toBlob(async (blob) => {
             try {
-                const formData = new FormData();
-                formData.append('file', blob, 'artwork.jpg');
-                formData.append('content', '🎨 New artwork submission!'); // Default message
+                const filename = 'molural_' + new Date().toISOString().slice(0, 10) + '.jpg';
                 
-                // This would send to a backend endpoint that forwards to Discord
-                // For now, just download as JPEG with visual feedback
+                // Download locally
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = 'molural_' + new Date().toISOString().slice(0, 10) + '.jpg';
+                link.download = filename;
                 link.click();
                 URL.revokeObjectURL(link.href);
                 
-                // Show success feedback
-                this.submitBtn.textContent = '✓ Submitted!';
+                // Show feedback
+                const originalText = this.submitBtn.textContent;
+                this.submitBtn.textContent = '✓ Downloaded!';
+                this.submitBtn.disabled = true;
+                
+                setTimeout(() => {
+                    this.submitBtn.textContent = originalText;
+                    this.submitBtn.disabled = false;
+                }, 3000);
+                
+                // Log for user to manually upload to Discord
+                console.log(`📥 Image downloaded as: ${filename}`);
+                console.log('Upload to Discord channel to submit to gallery');
+                alert(`Image downloaded!\n\nUpload to Discord to submit to gallery: https://discord.com/channels/1473826089959952602/1473826089959952605`);
+            } catch (error) {
+                console.error('Submit error:', error);
+                this.submitBtn.textContent = '❌ Error';
                 setTimeout(() => {
                     this.submitBtn.textContent = '✨ Submit to Gallery';
                 }, 2000);
-            } catch (error) {
-                console.error('Submit error:', error);
-                alert('Error submitting artwork');
             }
         }, 'image/jpeg', 0.95);
     }

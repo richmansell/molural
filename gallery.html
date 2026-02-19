@@ -237,14 +237,17 @@
             }
 
             loadGallery() {
-                // Fetch gallery data from GitHub repo
+                console.log('🔍 Loading gallery from:', GALLERY_DATA_URL);
                 fetch(GALLERY_DATA_URL)
                     .then(response => {
-                        if (!response.ok) throw new Error('Failed to load gallery');
+                        console.log('📡 Fetch response status:', response.status);
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
                         return response.json();
                     })
                     .then(data => {
+                        console.log('✓ Gallery data loaded:', data);
                         this.images = data.images || [];
+                        console.log(`✓ Found ${this.images.length} images`);
                         if (this.images.length === 0) {
                             this.showNoSubmissions();
                         } else {
@@ -252,7 +255,7 @@
                         }
                     })
                     .catch(error => {
-                        console.error('Gallery load error:', error);
+                        console.error('❌ Gallery load error:', error);
                         this.showNoSubmissions();
                     });
             }
