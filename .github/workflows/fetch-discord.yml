@@ -37,7 +37,7 @@ jobs:
       
       - name: Commit and push changes
         run: |
-          git add gallery-data.json
+          git add gallery-data.json gallery-images/
           git commit -m "Update gallery images from Discord [skip ci]" --allow-empty
           git push
         env:
