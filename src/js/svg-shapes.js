@@ -129,7 +129,7 @@ function loadSvgShapeFromUrl(key, name, url) {
     };
 }
 
-// Add Blob shape as a hardcoded canvas drawing (instead of SVG for better performance)
-// This is loaded from shapes.js, so no need to re-define it here
+// SVG shapes have been moved to shapes.js as canvas-based definitions for better performance
+// Add more SVG shapes here if needed
 
 
