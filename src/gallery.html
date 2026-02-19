@@ -66,6 +66,7 @@
             object-fit: cover;
             cursor: pointer;
             transition: transform 0.3s ease;
+            background: #f0f0f0;
         }
 
         .carousel-image:hover {
@@ -125,56 +126,6 @@
             width: 100%;
         }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            position: relative;
-            max-width: 85vw;
-            max-height: 85vh;
-        }
-
-        .modal-content img {
-            max-width: 100%;
-            max-height: 100%;
-            border-radius: 4px;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 179, 186, 0.8);
-            border: none;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            font-size: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .modal-close:hover {
-            background: #FFB3BA;
-        }
-
         @media (max-width: 768px) {
             .carousel-image {
                 flex: 0 0 calc(25% - 1px);
@@ -199,13 +150,6 @@
         </div>
     </div>
 
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <img id="modalImage" src="" alt="">
-            <button class="modal-close" id="closeModal">×</button>
-        </div>
-    </div>
-
     <script>
         // Configuration - pulls from git repo (no backend needed!)
         const GALLERY_DATA_URL = 'https://richmansell.github.io/molural/gallery-data.json?v=' + Math.random();
@@ -215,9 +159,6 @@
                 this.container = document.getElementById('carouselContainer');
                 this.prevBtn = document.getElementById('prevBtn');
                 this.nextBtn = document.getElementById('nextBtn');
-                this.modal = document.getElementById('modal');
-                this.modalImage = document.getElementById('modalImage');
-                this.closeModal = document.getElementById('closeModal');
                 this.images = [];
                 this.currentScroll = 0;
 
@@ -228,12 +169,6 @@
             setupEventListeners() {
                 this.prevBtn.addEventListener('click', () => this.scroll(-300));
                 this.nextBtn.addEventListener('click', () => this.scroll(300));
-                this.closeModal.addEventListener('click', () => this.modal.classList.remove('active'));
-                this.modal.addEventListener('click', (e) => {
-                    if (e.target === this.modal) {
-                        this.modal.classList.remove('active');
-                    }
-                });
             }
 
             loadGallery() {
@@ -276,7 +211,11 @@
                     img.alt = `Gallery submission ${index + 1}`;
                     img.title = imageData.timestamp;
                     img.className = 'carousel-image';
-                    img.addEventListener('click', () => this.openModal(imageData.url));
+                    img.style.cursor = 'pointer';
+                    img.addEventListener('click', () => {
+                        // Open image in new tab
+                        window.open(imageData.url, '_blank');
+                    });
                     
                     // Log image load attempts and failures
                     img.addEventListener('load', () => {
@@ -305,11 +244,6 @@
                 const { scrollLeft, scrollWidth, clientWidth } = this.container;
                 this.prevBtn.disabled = scrollLeft === 0;
                 this.nextBtn.disabled = scrollLeft + clientWidth >= scrollWidth - 10;
-            }
-
-            openModal(imageSrc) {
-                this.modalImage.src = imageSrc;
-                this.modal.classList.add('active');
             }
 
             showNoSubmissions() {

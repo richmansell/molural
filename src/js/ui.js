@@ -154,12 +154,33 @@ class UIManager {
                 }
                 
                 console.log('✓ Posted to Discord!');
-                this.submitBtn.textContent = '✓ Posted!';
                 
-                setTimeout(() => {
-                    this.submitBtn.textContent = '✨ Submit to Gallery';
-                    this.submitBtn.disabled = false;
-                }, 3000);
+                // Show thank you modal
+                const thankYouModal = document.getElementById('thankYouModal');
+                if (thankYouModal) {
+                    thankYouModal.style.display = 'flex';
+                    
+                    // Disable canvas interactions
+                    this.canvasManager.canvas.style.pointerEvents = 'none';
+                    this.canvasManager.canvas.style.opacity = '0.5';
+                    
+                    // Disable shape library dragging
+                    document.querySelectorAll('.shape-item').forEach(item => {
+                        item.draggable = false;
+                        item.style.opacity = '0.5';
+                        item.style.cursor = 'not-allowed';
+                    });
+                    
+                    // Disable color palette
+                    document.querySelectorAll('.color-box').forEach(box => {
+                        box.style.pointerEvents = 'none';
+                        box.style.opacity = '0.5';
+                    });
+                    
+                    // Disable submit button
+                    this.submitBtn.style.pointerEvents = 'none';
+                    this.submitBtn.style.opacity = '0.5';
+                }
                 
             } catch (error) {
                 console.error('Submit error:', error);

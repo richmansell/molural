@@ -292,6 +292,16 @@ button:active {
         </div>
     </div>
 
+    <!-- Thank you Modal -->
+    <div id="thankYouModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 40px; border-radius: 15px; text-align: center; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+            <div style="font-size: 60px; margin-bottom: 20px;">✨</div>
+            <h2 style="margin: 20px 0; color: #333;">Thank you!</h2>
+            <p style="font-size: 18px; color: #666; line-height: 1.6; margin-bottom: 20px;">Your masterpiece will be available in the gallery below shortly <3</p>
+            <div style="font-size: 14px; color: #999;">Gallery updates every hour ⏰</div>
+        </div>
+    </div>
+
     <script>
 // Shape definitions as functions that draw on canvas
 const shapeDefinitions = {
@@ -1298,12 +1308,33 @@ class UIManager {
                 }
                 
                 console.log('✓ Posted to Discord!');
-                this.submitBtn.textContent = '✓ Posted!';
                 
-                setTimeout(() => {
-                    this.submitBtn.textContent = '✨ Submit to Gallery';
-                    this.submitBtn.disabled = false;
-                }, 3000);
+                // Show thank you modal
+                const thankYouModal = document.getElementById('thankYouModal');
+                if (thankYouModal) {
+                    thankYouModal.style.display = 'flex';
+                    
+                    // Disable canvas interactions
+                    this.canvasManager.canvas.style.pointerEvents = 'none';
+                    this.canvasManager.canvas.style.opacity = '0.5';
+                    
+                    // Disable shape library dragging
+                    document.querySelectorAll('.shape-item').forEach(item => {
+                        item.draggable = false;
+                        item.style.opacity = '0.5';
+                        item.style.cursor = 'not-allowed';
+                    });
+                    
+                    // Disable color palette
+                    document.querySelectorAll('.color-box').forEach(box => {
+                        box.style.pointerEvents = 'none';
+                        box.style.opacity = '0.5';
+                    });
+                    
+                    // Disable submit button
+                    this.submitBtn.style.pointerEvents = 'none';
+                    this.submitBtn.style.opacity = '0.5';
+                }
                 
             } catch (error) {
                 console.error('Submit error:', error);
