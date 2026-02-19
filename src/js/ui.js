@@ -128,8 +128,19 @@ class UIManager {
         this.canvasManager.selectedShapeIndex = -1;
         this.canvasManager.redraw();
         
-        // Convert canvas to JPEG blob
-        this.canvasManager.canvas.toBlob(async (blob) => {
+        // Crop canvas to interactive area only (what user sees on screen)
+        const interactiveHeight = this.canvasManager.getInteractiveHeight();
+        const cropCanvas = document.createElement('canvas');
+        cropCanvas.width = this.canvasManager.canvas.width;
+        cropCanvas.height = interactiveHeight;
+        const cropCtx = cropCanvas.getContext('2d');
+        
+        // Copy only the interactive portion from main canvas
+        const imageData = this.canvasManager.ctx.getImageData(0, 0, this.canvasManager.canvas.width, interactiveHeight);
+        cropCtx.putImageData(imageData, 0, 0);
+        
+        // Convert cropped canvas to JPEG blob
+        cropCanvas.toBlob(async (blob) => {
             try {
                 const filename = 'molural_' + new Date().toISOString().slice(0, 10) + '.jpg';
                 
