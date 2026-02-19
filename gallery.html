@@ -208,7 +208,7 @@
 
     <script>
         // Configuration - pulls from git repo (no backend needed!)
-        const GALLERY_DATA_URL = 'https://richmansell.github.io/molural/gallery-data.json';
+        const GALLERY_DATA_URL = 'https://richmansell.github.io/molural/gallery-data.json?v=' + Math.random();
 
         class GalleryCarousel {
             constructor() {
@@ -238,7 +238,9 @@
 
             loadGallery() {
                 console.log('🔍 Loading gallery from:', GALLERY_DATA_URL);
-                fetch(GALLERY_DATA_URL)
+                console.log('📍 Window location:', window.location.href);
+                console.log('🔗 Document referrer:', document.referrer);
+                fetch(GALLERY_DATA_URL, { cache: 'no-store' })
                     .then(response => {
                         console.log('📡 Fetch response status:', response.status);
                         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -275,6 +277,16 @@
                     img.title = imageData.timestamp;
                     img.className = 'carousel-image';
                     img.addEventListener('click', () => this.openModal(imageData.url));
+                    
+                    // Log image load attempts and failures
+                    img.addEventListener('load', () => {
+                        console.log(`✓ Image ${index + 1} loaded:`, imageData.filename);
+                    });
+                    
+                    img.addEventListener('error', (e) => {
+                        console.error(`✗ Failed to load image ${index + 1}: ${imageData.url}`, e);
+                    });
+                    
                     this.container.appendChild(img);
                 });
 

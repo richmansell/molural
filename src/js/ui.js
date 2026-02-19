@@ -124,6 +124,10 @@ class UIManager {
     }
 
     handleSubmit() {
+        // Deselect any selected shapes first so selection handles don't appear in image
+        this.canvasManager.selectedShapeIndex = -1;
+        this.canvasManager.redraw();
+        
         // Convert canvas to JPEG blob
         this.canvasManager.canvas.toBlob(async (blob) => {
             try {
