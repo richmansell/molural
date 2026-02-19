@@ -129,33 +129,69 @@ class UIManager {
             try {
                 const filename = 'molural_' + new Date().toISOString().slice(0, 10) + '.jpg';
                 
-                // Download locally
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = filename;
-                link.click();
-                URL.revokeObjectURL(link.href);
+                // Get webhook URL from localStorage
+                let webhookUrl = localStorage.getItem('molural_webhook');
                 
-                // Show feedback
-                const originalText = this.submitBtn.textContent;
-                this.submitBtn.textContent = '✓ Downloaded!';
+                if (!webhookUrl) {
+                    // Prompt for webhook URL first time
+                    webhookUrl = prompt(
+                        'Discord Webhook URL needed for auto-submit.\n\n' +
+                        'Create at: Discord Guild → Channel Settings → Integrations → Webhooks\n\n' +
+                        'Paste webhook URL (or leave empty to download locally):'
+                    );
+                    
+                    if (webhookUrl) {
+                        localStorage.setItem('molural_webhook', webhookUrl);
+                    }
+                }
+                
                 this.submitBtn.disabled = true;
+                this.submitBtn.textContent = '⏳ Submitting...';
+                
+                if (webhookUrl) {
+                    // Post to Discord webhook
+                    const formData = new FormData();
+                    formData.append('file', blob, filename);
+                    formData.append('content', '✨ New artwork submission!');
+                    
+                    const response = await fetch(webhookUrl, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Discord error: ${response.status}`);
+                    }
+                    
+                    console.log('✓ Posted to Discord!');
+                    this.submitBtn.textContent = '✓ Posted!';
+                } else {
+                    // Fallback: download locally
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = filename;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                    
+                    console.log(`📥 Downloaded: ${filename}`);
+                    this.submitBtn.textContent = '✓ Downloaded!';
+                }
                 
                 setTimeout(() => {
-                    this.submitBtn.textContent = originalText;
+                    this.submitBtn.textContent = '✨ Submit to Gallery';
                     this.submitBtn.disabled = false;
                 }, 3000);
                 
-                // Log for user to manually upload to Discord
-                console.log(`📥 Image downloaded as: ${filename}`);
-                console.log('Upload to Discord channel to submit to gallery');
-                alert(`Image downloaded!\n\nUpload to Discord to submit to gallery: https://discord.com/channels/1473826089959952602/1473826089959952605`);
             } catch (error) {
                 console.error('Submit error:', error);
-                this.submitBtn.textContent = '❌ Error';
+                this.submitBtn.textContent = '✗ Error - try again';
+                this.submitBtn.disabled = false;
+                
                 setTimeout(() => {
                     this.submitBtn.textContent = '✨ Submit to Gallery';
                 }, 2000);
+                
+                alert(`Error: ${error.message}`);
             }
         }, 'image/jpeg', 0.95);
     }
