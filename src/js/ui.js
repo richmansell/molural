@@ -129,53 +129,28 @@ class UIManager {
             try {
                 const filename = 'molural_' + new Date().toISOString().slice(0, 10) + '.jpg';
                 
-                // Get webhook URL from localStorage
-                let webhookUrl = localStorage.getItem('molural_webhook');
-                
-                if (!webhookUrl) {
-                    // Prompt for webhook URL first time
-                    webhookUrl = prompt(
-                        'Discord Webhook URL needed for auto-submit.\n\n' +
-                        'Create at: Discord Guild → Channel Settings → Integrations → Webhooks\n\n' +
-                        'Paste webhook URL (or leave empty to download locally):'
-                    );
-                    
-                    if (webhookUrl) {
-                        localStorage.setItem('molural_webhook', webhookUrl);
-                    }
-                }
+                // Discord webhook URL (automatically configured)
+                const webhookUrl = 'https://discord.com/api/webhooks/1473834282496561246/fiNo4Rf8B9oL9-TCs2J-Su_7XgQJ98wn2VIJXUO7Yd68zWjREE3AS17thP81SUKcT2Se';
                 
                 this.submitBtn.disabled = true;
                 this.submitBtn.textContent = '⏳ Submitting...';
                 
-                if (webhookUrl) {
-                    // Post to Discord webhook
-                    const formData = new FormData();
-                    formData.append('file', blob, filename);
-                    formData.append('content', '✨ New artwork submission!');
-                    
-                    const response = await fetch(webhookUrl, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error(`Discord error: ${response.status}`);
-                    }
-                    
-                    console.log('✓ Posted to Discord!');
-                    this.submitBtn.textContent = '✓ Posted!';
-                } else {
-                    // Fallback: download locally
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = filename;
-                    link.click();
-                    URL.revokeObjectURL(link.href);
-                    
-                    console.log(`📥 Downloaded: ${filename}`);
-                    this.submitBtn.textContent = '✓ Downloaded!';
+                // Post to Discord webhook
+                const formData = new FormData();
+                formData.append('file', blob, filename);
+                formData.append('content', '✨ New artwork submission!');
+                
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Discord error: ${response.status}`);
                 }
+                
+                console.log('✓ Posted to Discord!');
+                this.submitBtn.textContent = '✓ Posted!';
                 
                 setTimeout(() => {
                     this.submitBtn.textContent = '✨ Submit to Gallery';
@@ -191,7 +166,7 @@ class UIManager {
                     this.submitBtn.textContent = '✨ Submit to Gallery';
                 }, 2000);
                 
-                alert(`Error: ${error.message}`);
+                alert(`Error submitting to Discord: ${error.message}`);
             }
         }, 'image/jpeg', 0.95);
     }
