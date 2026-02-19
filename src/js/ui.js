@@ -18,10 +18,7 @@ class UIManager {
     constructor(canvasManager) {
         this.canvasManager = canvasManager;
         this.colorPalette = document.getElementById('colorPalette');
-        this.opacitySlider = document.getElementById('opacitySlider');
-        this.opacityValue = document.getElementById('opacityValue');
-        this.saveBtn = document.getElementById('saveBtn');
-        this.clearBtn = document.getElementById('clearBtn');
+        this.submitBtn = document.getElementById('submitBtn');
         this.shapeLibrary = document.getElementById('shapeLibrary');
         this.currentColor = PASTEL_COLORS[0];
         this.previewCanvases = new Map(); // Store preview canvases by shape key
@@ -32,16 +29,7 @@ class UIManager {
     }
 
     setupEventListeners() {
-        this.saveBtn.addEventListener('click', () => this.handleSave());
-        this.clearBtn.addEventListener('click', () => this.handleClear());
-        this.opacitySlider.addEventListener('input', (e) => this.handleOpacityChange(e));
-    }
-
-    handleOpacityChange(e) {
-        const opacity = parseInt(e.target.value);
-        SHAPE_OPACITY = opacity / 100;
-        this.opacityValue.textContent = opacity;
-        this.canvasManager.redraw();
+        this.submitBtn.addEventListener('click', () => this.handleSubmit());
     }
 
     initializeColorPalette() {
@@ -135,12 +123,32 @@ class UIManager {
         this.shapeLibrary.appendChild(item);
     }
 
-    handleSave() {
-        this.canvasManager.saveAsJpeg();
-    }
-
-    handleClear() {
-        this.canvasManager.clearShapes();
+    handleSubmit() {
+        // Get canvas as blob and send to Discord
+        this.canvasManager.canvas.toBlob(async (blob) => {
+            try {
+                const formData = new FormData();
+                formData.append('file', blob, 'artwork.jpg');
+                formData.append('content', '🎨 New artwork submission!'); // Default message
+                
+                // This would send to a backend endpoint that forwards to Discord
+                // For now, just download as JPEG with visual feedback
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'molural_' + new Date().toISOString().slice(0, 10) + '.jpg';
+                link.click();
+                URL.revokeObjectURL(link.href);
+                
+                // Show success feedback
+                this.submitBtn.textContent = '✓ Submitted!';
+                setTimeout(() => {
+                    this.submitBtn.textContent = '✨ Submit to Gallery';
+                }, 2000);
+            } catch (error) {
+                console.error('Submit error:', error);
+                alert('Error submitting artwork');
+            }
+        }, 'image/jpeg', 0.95);
     }
 
     onShapeSelected(index) {

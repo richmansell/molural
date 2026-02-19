@@ -4,7 +4,7 @@ const CORNER_SIZE = 10;
 const ORIGINAL_IMAGE_INTERACTIVE_HEIGHT = 393; // Interactive area height in original image
 const SHAPE_SCALE = 3; // Shapes are 3x bigger
 const BASE_SIZE = 80; // Base size when dragged (gets multiplied by SHAPE_SCALE)
-let SHAPE_OPACITY = 0.6; // 60% opacity (can be changed via slider)
+let SHAPE_OPACITY = 0.75; // Always 75% opacity
 
 class CanvasManager {
     constructor(canvasElement) {
